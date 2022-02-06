@@ -28,13 +28,11 @@ exports.login = async (req, res) => {
     const user = await User.findOne({email});
     found = true;
     if(bcrypt.compareSync(password, user.password)){
-      console.log(process.env);
       const token = jwt.sign({name: user.name, email, password}, process.env.ACCESS_TOKEN, {expiresIn: '60m'});
       const refreshToken = jwt.sign({name: user.name, email, password}, process.env.REFRESH_TOKEN);
       await User.findByIdAndUpdate(user._id, {refreshToken, token});
       return res.status(200).json({token, refreshToken});
     }
-    console.log('failure');
     return res.status(400).json({message: 'Wrong email or password'});
   } catch (error) {
     return res.status(found ? 400 : 500).json({message: found ? 'Wrong email or password' : 'Please try again'});
