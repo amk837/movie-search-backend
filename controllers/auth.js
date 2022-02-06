@@ -28,7 +28,7 @@ exports.login = async (req, res) => {
     const user = await User.findOne({email});
     found = true;
     if(bcrypt.compareSync(password, user.password)){
-      console.log('success');
+      console.log(process.env);
       const token = jwt.sign({name: user.name, email, password}, process.env.ACCESS_TOKEN, {expiresIn: '60m'});
       const refreshToken = jwt.sign({name: user.name, email, password}, process.env.REFRESH_TOKEN);
       await User.findByIdAndUpdate(user._id, {refreshToken, token});
