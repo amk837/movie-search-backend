@@ -22,6 +22,7 @@ exports.token = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
+  console.log(req.body);
   let found = false;
   try {
     const {email, password} = req.body;
@@ -42,6 +43,7 @@ exports.login = async (req, res) => {
 
 
 exports.register = async (req, res) => {
+  console.log(req.body);
   const {name, email, password} = req.body;
   const userExists = await User.exists({email});
   if(userExists) return res.status(400).json({ message: 'User already exists' });
