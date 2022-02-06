@@ -24,5 +24,5 @@ mongoose.connect(`mongodb+srv://amk:5757231@movie-search.btnwv.mongodb.net/movie
 
 app.listen(port, () => {
   console.log('server running on localhost:' + port);
-  // updateMovies();
+  updateMovies();
 });

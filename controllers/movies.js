@@ -82,10 +82,16 @@ exports.updateMovies = async () => {
           overview,
           genres: genre_ids.map((id) => genresList[genres[id]]),
         };
-        await Movie.create(movie);
+        const exists = await Movie.findOne({ id });
+        if (!exists) {
+          await Movie.create(movie);
+        }
       }
     );
   }
+  setTimeout(() => {
+    this.updateMovies();
+  }, 1000*60*60*24)
 };
 
 exports.getMovies = async (req, res) => {
