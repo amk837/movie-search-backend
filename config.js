@@ -7,4 +7,5 @@ module.exports = {
     accessToken: process.env.ACCESS_TOKEN,
     refreshToken: process.env.REFRESH_TOKEN,
     environment: process.env.NODE_ENV,
+    mongoDbUrl: process.env.MONGO_DB_URL
 }

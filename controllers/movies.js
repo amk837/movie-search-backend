@@ -10,8 +10,7 @@ exports.addToFav = async (req, res) => {
   try {
     const { favorites, email } = req.user;
     if (!favorites.includes(movie)) favorites.push(movie);
-    const updated = await User.updateOne({ email }, { favorites });
-    console.log(updated);
+    await User.updateOne({ email }, { favorites });
     return res.status(200).json({ message: 'Movie added to favorites', status: 200 });
   } catch (error) {
     return res.status(400).json({
@@ -25,8 +24,8 @@ exports.removeFromFav = async (req, res) => {
   try {
     let { favorites, email } = req.user;
     favorites = favorites.filter((fav) => fav.id != movieId);
-    const updated = await User.updateOne({ email }, { favorites });
-    console.log(updated);
+    await User.updateOne({ email }, { favorites });
+    
     return res.status(200).json({ message: 'Movie removed from favorites', status: 200 });
   } catch (error) {
     return res.status(400).json({
@@ -39,7 +38,7 @@ exports.removeFromFav = async (req, res) => {
 exports.getFav = async (req, res) => {
   try {
     const { favorites } = req.user;
-    return res.status(200).json({ favorites, status: 200});
+    return res.status(200).json({ favorites, status: 200 });
   } catch (error) {
     return res.status(400).json({
       message: 'Please try again',
@@ -52,9 +51,15 @@ exports.updateMovies = async () => {
   const genresList = await (
     await axios.get(`${BASE_URL_MOVIES}/genre/movie/list?api_key=${API_KEY}`)
   ).data.genres;
+
   const genres = {};
-  genresList.forEach(({ id }, index) => {
+  genresList.forEach(async ({ id, name }, index) => {
     genres[id] = index;
+    const exists = await Genre.findOne({ id });
+    if (!exists) {
+      await Genre.create({ id, name });
+    }
+
   });
   for (let i = 1; i <= 500; i++) {
     const api = `${BASE_URL_MOVIES}/movie/popular?api_key=${API_KEY}&page=${i}`;
@@ -91,7 +96,7 @@ exports.updateMovies = async () => {
   }
   setTimeout(() => {
     this.updateMovies();
-  }, 1000*60*60*24)
+  }, 1000 * 60 * 60 * 24)
 };
 
 exports.getMovies = async (req, res) => {
@@ -108,12 +113,12 @@ exports.getMovies = async (req, res) => {
 
   const { from, to } = release_date || {};
 
-  const popularityRanges = Array.from(Array(10)).map((value, index) => [index*1000, (index+1)*1000]);
+  const popularityRanges = Array.from(Array(10)).map((value, index) => [index * 1000, (index + 1) * 1000]);
   popularityRanges.push([0, 5000]);
   popularityRanges.push([5000, 10000]);
   popularityRanges.push([0, 10000]);
 
-  const ratingRanges = Array.from(Array(10)).map((value, index) => [index, (index === 9 ? 9.9: index+1)]);
+  const ratingRanges = Array.from(Array(10)).map((value, index) => [index, (index === 9 ? 9.9 : index + 1)]);
   ratingRanges.push([0, 5]);
   ratingRanges.push([5, 9.9]);
   ratingRanges.push([0, 9.9]);
@@ -128,19 +133,19 @@ exports.getMovies = async (req, res) => {
       $lte: `${to || '2100'}-99-99`,
     },
     vote_average: { $gte: `${minRating}`, $lte: `${maxRating}` },
-    popularity: { $gte: minPopularity, $lte: maxPopularity},
+    popularity: { $gte: minPopularity, $lte: maxPopularity },
     'genres.name': genres && genres.length > 0 ? { $all: genres.map((genre) => new RegExp(`${genre}`, 'i')) } : /.*/,
   };
-  console.log(filters);
+
   const sortFilter = { [sortBy]: asc || -1 };
-  console.log(sortFilter);
+
   let data = await Movie.find(filters).sort(sortFilter);
 
-  const currentPage = page > Math.ceil(data.length/20) ? 1 : page || 1;
+  const currentPage = page > Math.ceil(data.length / 20) ? 1 : page || 1;
 
-  return res.status(200).json({ 
-    results: data.slice((currentPage-1)*20, (currentPage*20)), 
-    total_pages: Math.ceil(data.length/20), 
+  return res.status(200).json({
+    results: data.slice((currentPage - 1) * 20, (currentPage * 20)),
+    total_pages: Math.ceil(data.length / 20),
     page: currentPage
   });
 };

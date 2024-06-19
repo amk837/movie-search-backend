@@ -2,8 +2,10 @@ const express = require('express');
 const { port } = require('./config');
 const auth = require('./routes/auth');
 const movies = require('./routes/movies');
+const { updateMovies } = require('./controllers/movies');
+const config = require('./config');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const mongoose = require('mongoose');
-const { updateMovies } = require( './controllers/movies' );
 
 const app = express();
 app.use((req, res, next) => {
@@ -13,16 +15,22 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use('/', auth);
 app.use('/movies', movies);
 app.use('**', (req, res, next) => {
   res.send('<h1>404 Page Not Found</h1>')
 });
 
-mongoose.connect(`mongodb+srv://amk:5757231@movie-search.btnwv.mongodb.net/movie-search?retryWrites=true&w=majority`);
+const uri = config.mongoDbUrl;
 
-app.listen(port, () => {
+const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
+
+const initialize = async () => {
   console.log('server running on localhost:' + port);
+  await mongoose.connect(uri, clientOptions);
   updateMovies();
+};
+app.listen(port, () => {
+  initialize();
 });
