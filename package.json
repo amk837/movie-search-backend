@@ -2,10 +2,11 @@
   "name": "assignment-backend",
   "version": "1.0.0",
   "description": "contains authentication code for movie search app backend",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "devStart": "nodemon server.js"
+    "devStart": "nodemon server.js",
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
