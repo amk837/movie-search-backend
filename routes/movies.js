@@ -12,7 +12,7 @@ router.get('/getFavorites', authenticateToken, movies.getFav);
 
 router.search('/', movies.getMovies);
 
-// router.post('/', movies.getMovies);
+router.post('/', movies.getMovies);
 
 router.get('/genres', movies.getGenres);
 module.exports = router;
