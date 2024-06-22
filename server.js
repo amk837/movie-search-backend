@@ -21,7 +21,7 @@ app.use('**', (req, res) => {
 });
 
 const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
-
+mongoose.set('strictQuery', true);
 const initialize = async () => {
   console.log('server running on localhost:' + port);
   if (mongoDbUrl) {
