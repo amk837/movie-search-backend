@@ -90,6 +90,7 @@ exports.updateMovies = async () => {
         try {
           const exists = await Movie.findOne({ id });
           if (!exists) {
+            console.log(exists, movie.id);
             await Movie.create(movie);
           }
         } catch (err) {
